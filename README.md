@@ -21,3 +21,7 @@ This is a simple and responsive weather application built using **HTML**, **CSS*
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/weather-app.git
+2. Navigate to the project directory:
+   ```bash
+   cd weather-app
+3. Open **index.html** in your web browser.
