@@ -26,4 +26,3 @@ This is a simple and responsive weather application built using **HTML**, **CSS*
    cd weather-app
 3. Open **index.html** in your web browser.
 
-4. Or you can visit here: [https://sudo-satvik.github.io/weather-app/](https://sudo-satvik.github.io/weather-app/)
