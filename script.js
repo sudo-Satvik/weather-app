@@ -1,7 +1,6 @@
 let cityInput = document.getElementById('input-city'),
     searchBtn = document.getElementById('searchBtn'),
     locationBtn = document.getElementById('locationBtn'),
-    api_key = 'bc4809c2574616287ae6cfd05d059b89',
     currentWeatherCard = document.querySelectorAll('.weather-left .card')[0],
     fiveDaysForecastCard = document.querySelector('.day-forecast');
     aqiCard = document.querySelectorAll('.highlights .card')[0],
@@ -13,7 +12,9 @@ let cityInput = document.getElementById('input-city'),
     hourlyForecastCard = document.querySelector('.hourly-forecast'),
     aqiList = ['Good', 'Fair', 'Moderate', 'Poor', 'Very Poor'];
 
-function getWeatherDetails(name, lat, lon, country, state) {
+const api_key = "bc4809c2574616287ae6cfd05d059b89";
+
+function getWeatherDetails(name, lat, lon, country) {
     let FORECAST_API_URL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${api_key}`,
         WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${api_key}`,
         AIR_POLLUTION_API_URL = `http://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${api_key}`,
@@ -41,9 +42,8 @@ function getWeatherDetails(name, lat, lon, country, state) {
             'Dec'
         ];
 
-    fetch(AIR_POLLUTION_API_URL).then(res => res.json()).then(data =>{
-        // console.log(data);
-        let {co, no, no2, o3, so2, pm2_5, pm10, nh3} = data.list[0].components;
+    fetch(AIR_POLLUTION_API_URL).then(res => res.json()).then((data) =>{
+        const {co, no, no2, o3, so2, pm2_5, pm10, nh3} = data.list[0].components;
         aqiCard.innerHTML = `
             <div class="card-head">
                 <p>Air Quality Index</p>
@@ -151,19 +151,18 @@ function getWeatherDetails(name, lat, lon, country, state) {
             alert('Failed to fetch current weather');
         });
         fetch(FORECAST_API_URL).then(res => res.json()).then(data => {
-            // console.log(data);
             let hourlyForecast = data.list;
             hourlyForecastCard.innerHTML = '';
             for(i = 0 ; i <= 7 ; i++){
                 let hrForecast = new Date(hourlyForecast[i].dt_txt);
                 let hr = hrForecast.getHours();
-                let a = 'PM';
-                if(hr < 12) a = 'AM';
+                let standard = 'PM';
+                if(hr < 12) standard = 'AM';
                 if (hr == 0) hr = 12;
                 if (hr > 12) hr -= 12;
                 hourlyForecastCard.innerHTML += `
                     <div class="card">
-                        <p>${hr} ${a}</p>
+                        <p>${hr} ${standard}</p>
                         <img src="https://openweathermap.org/img/wn/${hourlyForecast[i].weather[0].icon}.png" alt="">
                         <p>${(hourlyForecast[i].main.temp - 273.15).toFixed(2)}&deg;C</p>
                     </div>
@@ -196,21 +195,31 @@ function getWeatherDetails(name, lat, lon, country, state) {
         });
 }
 
-function getCityCoordinates() {
+async function getCityCoordinates() {
     let cityName = cityInput.value.trim();
-    if (!cityName) return;
+    
+    if(!cityName) {
+        throw new Error("Please enter a valid city name");
+    }
+    
+    try {
+        const response = await fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${api_key}`);
 
-    let GEOCODING_API_URL = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${api_key}`;
-    fetch(GEOCODING_API_URL)
-        .then(res => res.json())
-        .then(data => {
-            let { name, lat, lon, country, state } = data[0];
-            getWeatherDetails(name, lat, lon, country, state);
-        })
-        .catch(() => {
-            alert(`Failed to fetch coordinates of ${cityName}`);
-        });
+        if(!response.ok){
+            throw new Error(`Failed to fetch coordinates of ${cityName}`);
+        }
+
+        const data = await response.json();
+        const {name, lon, lat, country, state} = data[0];
+
+        getWeatherDetails(name, lat, lon, country, state);
+    } catch (error) {
+        alert(`Failed to get the weather details of ${cityName}`);
+    } finally {
+        cityInput.value = '';
+    }
 }
+
 window.onload = () =>{
     getMyLocation();
 }
