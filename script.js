@@ -17,7 +17,7 @@ const api_key = "bc4809c2574616287ae6cfd05d059b89";
 function getWeatherDetails(name, lat, lon, country) {
     let FORECAST_API_URL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${api_key}`,
         WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${api_key}`,
-        AIR_POLLUTION_API_URL = `http://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${api_key}`,
+        AIR_POLLUTION_API_URL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${api_key}`,
         days = [
             'Sunday',
             'Monday',
@@ -203,7 +203,7 @@ async function getCityCoordinates() {
     }
     
     try {
-        const response = await fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${api_key}`);
+        const response = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${api_key}`);
 
         if(!response.ok){
             throw new Error(`Failed to fetch coordinates of ${cityName}`);
@@ -226,7 +226,7 @@ window.onload = () =>{
 function getMyLocation(){
     navigator.geolocation.getCurrentPosition(position => {
         let {latitude, longitude} = position.coords;
-        let REVERSE_GEOCODING_URL = `http://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${api_key}`;
+        let REVERSE_GEOCODING_URL = `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${api_key}`;
 
         fetch(REVERSE_GEOCODING_URL).then(res => res.json()).then(data => {
             let {name, country, state} = data[0];
